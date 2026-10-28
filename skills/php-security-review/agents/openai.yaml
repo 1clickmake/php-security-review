@@ -1,0 +1,7 @@
+interface:
+  display_name: "PHP Security Review"
+  short_description: "PHP 8+ / Gnuboard5 보안 검수 — 코드·버전·의존성 3축"
+  default_prompt: "이 PHP 프로젝트를 보안 검수해 주세요. 버전/CVE 대조(Step 0.5)부터 시작하세요."
+
+policy:
+  allow_implicit_invocation: false

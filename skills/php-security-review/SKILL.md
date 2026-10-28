@@ -1,5 +1,5 @@
 ---
-name: PHP Security Review
+name: php-security-review
 description: >-
   PHP 8+ 순수 PHP(프레임워크 없음)와 그누보드5/영카트 코드베이스 보안 검수 워크플로.
   SQL 인젝션, XSS, LFI/RFI, 파일 업로드, 역직렬화, 커맨드 인젝션, SSRF, 세션/인증 결함,
@@ -10,6 +10,7 @@ description: >-
 metadata:
   opencode/autoinvoke: false
   author: cmake
+  version: "1.1.0"
   php: ">=8.0"
   scope: vanilla-php, gnuboard5
   license: MIT

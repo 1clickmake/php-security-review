@@ -3,6 +3,26 @@
 All notable changes to this project are documented here.
 Format based on [Keep a Changelog](https://keepachangelog.com/), versioning follows [SemVer](https://semver.org/).
 
+## [1.1.0] - 2026-10-28
+
+### Added
+
+- **Portable distribution** — the same `SKILL.md` folder now installs into any Agent Skills host:
+  OpenCode, Claude Code, Codex CLI / ChatGPT desktop, Google Antigravity, Cursor, GitHub Copilot, Gemini CLI.
+- `AGENTS.md` — universal entry point for agents that read repo-level instructions.
+- `scripts/install.ps1` / `scripts/install.sh` — per-agent installer with `global` / `project` scope, `-WithCommand`, `-List`.
+- `docs/portable.md` — per-agent paths, invocation, and limitations.
+- `portable/chatgpt-instructions.md` — self-contained instructions for ChatGPT Custom GPT / Projects.
+- `portable/chat-prompt.md` — paste-in prompt for chat-only environments.
+- `.cursor/rules/php-security-review.mdc` — Cursor rule for PHP files.
+- `.github/copilot-instructions.md` — Copilot repository instructions.
+- `skills/php-security-review/agents/openai.yaml` — OpenAI metadata with `allow_implicit_invocation: false`.
+
+### Changed
+
+- README now includes a compatibility matrix and installer quick start.
+- `SKILL.md` metadata adds `version: 1.1.0`.
+
 ## [1.0.0] - 2026-10-28
 
 ### Added

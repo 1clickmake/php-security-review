@@ -2,6 +2,9 @@
 
 이 문서는 `php-security-review` 스킬을 에이전트에 설치하는 전체 절차를 다룹니다.
 
+> **여러 에이전트에 한 번에 설치**하려면 `scripts/install.ps1 -Target all -Scope global` 를 사용하세요.
+> 에이전트별 경로·호출 방식·제약은 **[portable.md](portable.md)** 에 정리되어 있습니다.
+
 - [0. 사전 확인](#0-사전-확인)
 - [1. OpenCode 전역 설치](#1-opencode-전역-설치)
 - [2. OpenCode 프로젝트별 설치](#2-opencode-프로젝트별-설치)

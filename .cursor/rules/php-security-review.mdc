@@ -1,0 +1,18 @@
+---
+description: PHP 8+ / 그누보드5 보안 검수 — 버전/CVE 대조 후 source→sink 데이터 흐름 추적
+globs: ["**/*.php"]
+alwaysApply: false
+---
+
+PHP 보안 검수 요청이면 `skills/php-security-review/SKILL.md` 를 읽고 그 워크플로를 따른다.
+
+핵심 규칙:
+
+1. **Step 0.5 먼저** — `scripts/version-check.ps1` 로 PHP/그누보드 버전과 CVE를 대조한다.
+2. 스캐너(`scripts/scan.ps1`) 결과는 **후보**일 뿐이다. `source → sink` 를 코드로 확인한다.
+3. 방어 함수가 싱크에 맞는지 따진다. `intval`은 HTML에, `htmlspecialchars`는 SQL에 무의미하다.
+4. 증거가 없으면 "확인 필요"로 분류한다. 추측으로 Critical을 올리지 않는다.
+5. 그누보드 코어는 직접 패치하지 않고 버전 업데이트를 권고한다.
+6. 코드 수정은 사용자가 요청할 때만, 취약 지점 단위 최소 diff로.
+
+보고서 형식: `즉시 조치(버전) → 요약 → 항목별(위치/CWE/흐름/도달조건/영향/패치/재검증) → 확인 필요 → 강화 권고`

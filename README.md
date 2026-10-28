@@ -40,9 +40,12 @@ php-security-review/
 ├── README.md
 ├── LICENSE                      # MIT
 ├── CHANGELOG.md
+├── AGENTS.md                    # 범용 에이전트 진입점 (Codex/Cursor/Copilot/Antigravity)
 ├── skills/
 │   └── php-security-review/     # ← 스킬 본체 (디렉터리명 = 스킬 ID)
 │       ├── SKILL.md             # 워크플로 Step 0 ~ 6 + Step 0.5
+│       ├── agents/
+│       │   └── openai.yaml          # ChatGPT/Codex 메타데이터 (자동 호출 off)
 │       ├── references/
 │       │   ├── checklist.md         # CWE 매핑 취약점 카탈로그
 │       │   ├── php8-hardening.md    # PDO/세션/업로드/CSRF/SSRF/헤더 하드닝 코드
@@ -53,19 +56,31 @@ php-security-review/
 │           └── version-check.ps1    # 버전·CVE 대조
 ├── commands/
 │   └── phpsec.md                # /phpsec 슬래시 커맨드
+├── scripts/
+│   ├── install.ps1              # 에이전트별 자동 설치 (Windows)
+│   └── install.sh               # 에이전트별 자동 설치 (macOS/Linux)
+├── .cursor/rules/               # Cursor 규칙
+├── .github/
+│   └── copilot-instructions.md  # Copilot 저장소 지침
+├── portable/
+│   ├── chatgpt-instructions.md  # ChatGPT Custom GPT / Project 지침
+│   └── chat-prompt.md           # 범용 채팅 붙여넣기 프롬프트
 ├── docs/
-│   ├── install.md               # 설치 상세 (OpenCode / Claude Code / 수동)
-│   └── usage.md                 # 사용법 상세 (시나리오별)
+│   ├── install.md               # 설치 상세
+│   ├── usage.md                 # 사용법 상세 (시나리오별)
+│   └── portable.md              # 다른 AI 에이전트에서 사용하기
 └── examples/
     └── report-sample.md         # 보고서 출력 예시
 ```
+
+> 설치 스크립트가 각 에이전트의 스킬 경로로 복사합니다. 경로 표는 [docs/portable.md](docs/portable.md) 참고.
 
 ### 요구사항
 
 | 항목 | 필수 | 비고 |
 |---|---|---|
 | Windows PowerShell **5.1+** | ✅ | Windows 10/11 기본 탑재. PowerShell 7(`pwsh`)도 가능 |
-| OpenCode 또는 Claude Code | ✅ | 스킬을 지원하는 에이전트. 스크립트만 단독 사용도 가능 |
+| OpenCode 또는 Claude Code | ✅ | Agent Skills 지원 에이전트. 스크립트만 단독 사용도 가능 |
 | PHP CLI | ⬜ | `php -l` 문법 검사용. 없어도 검수 가능 |
 | Git | ⬜ | 저장소 설치 시 |
 | **선행 스킬** | ❌ | **없음.** 독립 실행형입니다 (아래 참고) |
@@ -85,9 +100,50 @@ php -v                                            # 선택
 git --version                                     # 선택
 ```
 
+### 지원 환경
+
+`SKILL.md` 오픈 표준을 따르므로 **하나의 폴더를 여러 에이전트에서 그대로** 씁니다.
+
+| 에이전트 | 지원 | 설치 경로 (전역 / 프로젝트) |
+|---|---|---|
+| **OpenCode** | ✅ | `~/.config/opencode/skills/` / `.opencode/skills/` |
+| **Claude Code** | ✅ | `~/.claude/skills/` / `.claude/skills/` |
+| **Codex CLI · ChatGPT 데스크톱** | ✅ | `~/.agents/skills/` / `.agents/skills/` |
+| **Google Antigravity** | ✅ | `~/.gemini/config/skills/` / `.agents/skills/` |
+| **Cursor** | ✅ | `~/.cursor/skills/` / `.cursor/skills/`, `.agents/skills/` |
+| **GitHub Copilot** | ✅ | `~/.copilot/skills/` / `.github/skills/`, `.agents/skills/` |
+| **Gemini CLI** (레거시) | ✅ | `~/.gemini/skills/` / `.gemini/skills/` |
+| **ChatGPT 웹** | △ | Custom GPT / Project에 지침 + 지식 파일 |
+| **Claude 웹 · Gemini 웹** | △ | 프롬프트에 요약 붙여넣기 |
+
+> `.agents/skills/` 는 Codex · Cursor · Copilot · Antigravity가 공통으로 읽습니다. 한 번 복사로 여러 에이전트에서 사용할 수 있습니다.
+> 에이전트별 상세 절차와 제약: **[docs/portable.md](docs/portable.md)**
+
 ### 설치
 
-#### 방법 1 — OpenCode 전역 설치 (권장)
+#### 방법 0 — 자동 설치 (권장)
+
+```powershell
+git clone https://github.com/1clickmake/php-security-review.git "$env:TEMP\psr"
+cd "$env:TEMP\psr"
+
+# 전체 에이전트에 전역 설치
+.\scripts\install.ps1 -Target all -Scope global
+
+# 특정 에이전트 + /phpsec 커맨드
+.\scripts\install.ps1 -Target opencode,claude -Scope global -WithCommand
+
+# 특정 프로젝트에 설치
+.\scripts\install.ps1 -Target cursor -Scope project -ProjectPath C:\work\my-site
+```
+
+macOS/Linux:
+
+```bash
+./scripts/install.sh --target all --scope global
+```
+
+#### 방법 1 — OpenCode 전역 설치
 
 ```powershell
 # 1) 저장소 받기
@@ -267,6 +323,19 @@ PHP 버전      : 8.4.27  (출처: HTTP 헤더)
 판정          : [위험] 5.6.43 버전 뒤처짐 — 보안패치 누락 가능
 ```
 
+#### 5) 다른 AI에서
+
+| 환경 | 방법 |
+|---|---|
+| **Antigravity** | `.agents/skills/` 또는 `~/.gemini/config/skills/` 에 복사 |
+| **Codex / ChatGPT 데스크톱** | `~/.agents/skills/` 에 복사 후 `/skills` 또는 `$php-security-review` |
+| **Cursor** | `.cursor/skills/` 에 복사 후 `/php-security-review` |
+| **Copilot** | `.github/skills/` 에 복사 |
+| **ChatGPT 웹** | `portable/chatgpt-instructions.md` → Custom GPT/Project 지침, `references/*.md` → Knowledge |
+| **Claude 웹 / Gemini 웹** | `portable/chat-prompt.md` 붙여넣기 |
+
+상세 절차와 제약: **[docs/portable.md](docs/portable.md)**
+
 ### 보고서 형식
 
 ```markdown
@@ -355,10 +424,27 @@ It does not just grep. Every candidate is either confirmed with a concrete data-
 | Item | Required | Notes |
 |---|---|---|
 | Windows PowerShell 5.1+ | ✅ | Preinstalled on Windows 10/11. PowerShell 7 works too |
-| OpenCode or Claude Code | ✅ | Any agent supporting skills. Scripts can also run standalone |
+| OpenCode or Claude Code | ✅ | Any Agent Skills host. Scripts can also run standalone |
 | PHP CLI | ⬜ | Only for `php -l` |
 | Git | ⬜ | Only for cloning |
 | **Prerequisite skills** | ❌ | **None.** Fully self-contained |
+
+### Compatibility
+
+The skill follows the open Agent Skills standard (`SKILL.md`), so one folder works across agents.
+
+| Agent | Support | Install path (global / project) |
+|---|---|---|
+| OpenCode | ✅ | `~/.config/opencode/skills/` / `.opencode/skills/` |
+| Claude Code | ✅ | `~/.claude/skills/` / `.claude/skills/` |
+| Codex CLI · ChatGPT desktop | ✅ | `~/.agents/skills/` / `.agents/skills/` |
+| Google Antigravity | ✅ | `~/.gemini/config/skills/` / `.agents/skills/` |
+| Cursor | ✅ | `~/.cursor/skills/` / `.cursor/skills/` |
+| GitHub Copilot | ✅ | `~/.copilot/skills/` / `.github/skills/` |
+| ChatGPT web | △ | Custom GPT / Project with instructions + knowledge files |
+| Claude web · Gemini web | △ | Paste `portable/chat-prompt.md` |
+
+See [docs/portable.md](docs/portable.md) for per-agent steps.
 
 ### Install (OpenCode, global)
 
